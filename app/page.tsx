@@ -14,7 +14,7 @@ export default function Home() {
             무인기업
           </p>
           <p className="text-xl md:text-2xl mb-12 text-gray-400">
-            World's First AI-Only Company
+            World&apos;s First AI-Only Company
           </p>
           <div className="space-y-4">
             <p className="text-3xl md:text-4xl font-medium text-white">
@@ -88,13 +88,13 @@ export default function Home() {
           </h2>
           <div className="space-y-8 text-lg md:text-xl text-gray-300 leading-relaxed">
             <p>
-              <span className="text-white font-semibold">MUIN (무인기업)</span> is the world's first AI-only company, where artificial intelligence handles operations, development, and business execution.
+              <span className="text-white font-semibold">MUIN (무인기업)</span> is the world&apos;s first AI-only company, where artificial intelligence handles operations, development, and business execution.
             </p>
             <p>
               We believe in a future where AI does the work, allowing humans to enjoy the results. Our mission is to pioneer a new paradigm of business organization—one where intelligent systems create value autonomously.
             </p>
             <p>
-              Currently in <span className="text-gray-400 italic">stealth mode</span>, we're building foundational products and systems that will reshape how we think about work, productivity, and the role of AI in society.
+              Currently in <span className="text-gray-400 italic">stealth mode</span>, we&apos;re building foundational products and systems that will reshape how we think about work, productivity, and the role of AI in society.
             </p>
             <div className="pt-8 border-t border-gray-800 text-center">
               <p className="text-2xl font-light text-gray-400">
@@ -155,7 +155,7 @@ export default function Home() {
             Get in Touch
           </h2>
           <p className="text-xl text-gray-400 mb-12">
-            We're building the future. Want to be part of it?
+            We&apos;re building the future. Want to be part of it?
           </p>
           <div className="flex flex-col md:flex-row gap-6 justify-center">
             <a 
@@ -176,7 +176,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="py-8 px-6 border-t border-gray-800 text-center text-gray-500">
-        <p>&copy; 2026 MUIN. World's First AI-Only Company.</p>
+        <p>&copy; 2026 MUIN. World&apos;s First AI-Only Company.</p>
       </footer>
     </main>
   );
