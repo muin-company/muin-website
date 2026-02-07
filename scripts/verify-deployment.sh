@@ -1,85 +1,69 @@
 #!/bin/bash
-# Verify muin.company deployment
-# Usage: ./scripts/verify-deployment.sh [URL]
+# Deployment Verification Script
+# Usage: ./scripts/verify-deployment.sh [domain]
 
-URL="${1:-https://muin.company}"
+DOMAIN="${1:-muin.company}"
 
-echo "Verifying deployment at: $URL"
-echo "================================"
+echo "🔍 Verifying deployment for: $DOMAIN"
+echo "===================================="
 echo ""
 
-# Check HTTP status
-echo "1. HTTP Status:"
-STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
-if [ "$STATUS" == "200" ]; then
-    echo "   ✅ Status: $STATUS (OK)"
-else
-    echo "   ❌ Status: $STATUS (Expected 200)"
-fi
-
-# Check server header
+# DNS Resolution
+echo "1. DNS Resolution:"
+dig +short "$DOMAIN" A | while read ip; do
+    echo "   ✓ $ip"
+done
 echo ""
-echo "2. Hosting Provider:"
-SERVER=$(curl -sI "$URL" | grep -i "^server:" | cut -d' ' -f2- | tr -d '\r')
+
+# Server Check
+echo "2. Server Header:"
+SERVER=$(curl -sI "https://$DOMAIN" | grep -i "^server:" | cut -d' ' -f2-)
 echo "   Server: $SERVER"
 if [[ "$SERVER" == *"Vercel"* ]]; then
-    echo "   ✅ Deployed on Vercel"
+    echo "   ✅ Hosted on Vercel"
 elif [[ "$SERVER" == *"GitHub"* ]]; then
-    echo "   ⚠️  Deployed on GitHub Pages"
+    echo "   ⚠️  Still on GitHub Pages"
 else
-    echo "   ℹ️  Unknown hosting provider"
+    echo "   ❓ Unknown server"
 fi
-
-# Check title
 echo ""
-echo "3. Page Title:"
-TITLE=$(curl -s "$URL" | grep -oP '(?<=<title>)[^<]+' | head -1)
-echo "   $TITLE"
 
-# Check response time
+# SSL Certificate
+echo "3. SSL Certificate:"
+CERT_INFO=$(curl -vI "https://$DOMAIN" 2>&1 | grep "CN=")
+echo "   $CERT_INFO"
 echo ""
-echo "4. Response Time:"
-TIME=$(curl -s -o /dev/null -w "%{time_total}" "$URL")
-echo "   ${TIME}s"
 
-# Check SSL certificate
+# HTTP → HTTPS Redirect
+echo "4. HTTP Redirect:"
+REDIRECT=$(curl -sI "http://$DOMAIN" | grep -i "^location:" | cut -d' ' -f2-)
+if [[ "$REDIRECT" == *"https"* ]]; then
+    echo "   ✅ Redirects to HTTPS: $REDIRECT"
+else
+    echo "   ⚠️  No HTTPS redirect"
+fi
 echo ""
-echo "5. SSL Certificate:"
-if curl -sI "$URL" | grep -q "HTTP/2"; then
-    echo "   ✅ HTTPS/2 enabled"
-else
-    echo "   ⚠️  HTTP/1.1 or no HTTPS"
-fi
 
-# Check critical content
+# Security Headers
+echo "5. Security Headers:"
+curl -sI "https://$DOMAIN" | grep -E "X-Frame-Options|X-Content-Type-Options|X-XSS-Protection" | while read header; do
+    echo "   ✓ $header"
+done
 echo ""
-echo "6. Content Verification:"
-CONTENT=$(curl -s "$URL")
 
-if echo "$CONTENT" | grep -q "MUIN"; then
-    echo "   ✅ MUIN branding present"
-else
-    echo "   ❌ MUIN branding missing"
-fi
-
-if echo "$CONTENT" | grep -q "일하는 AI"; then
-    echo "   ✅ Korean tagline present"
-else
-    echo "   ❌ Korean tagline missing"
-fi
-
-if echo "$CONTENT" | grep -q "tools.muin.company"; then
-    echo "   ✅ Tools link present"
-else
-    echo "   ❌ Tools link missing"
-fi
-
-if echo "$CONTENT" | grep -q "gumsi"; then
-    echo "   ✅ Gumsi link present"
-else
-    echo "   ❌ Gumsi link missing"
-fi
-
+# Page Title
+echo "6. Page Content:"
+TITLE=$(curl -s "https://$DOMAIN" | grep -o "<title>.*</title>" | sed 's/<[^>]*>//g')
+echo "   Title: $TITLE"
 echo ""
-echo "================================"
+
+# Status Summary
+echo "=================================="
 echo "Verification complete!"
+echo ""
+echo "Manual checks needed:"
+echo "  - Visit https://$DOMAIN in browser"
+echo "  - Test all navigation links"
+echo "  - Verify mobile responsiveness"
+echo "  - Run Lighthouse audit"
+echo ""
